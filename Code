@@ -1,0 +1,45 @@
+// Pin Definitions
+const int tempPin = A1;     
+const int enablePin = 9;  //Speed of Motor
+const int in1Pin = 10;    // Input-1
+const int in2Pin = 11;    // Input-2
+
+void setup() {
+
+  Serial.begin(9600);
+  pinMode(enablePin, OUTPUT);
+  pinMode(in1Pin, OUTPUT);
+  pinMode(in2Pin, OUTPUT);
+  
+  digitalWrite(in1Pin, HIGH);
+  digitalWrite(in2Pin, LOW);
+}
+
+void loop() {
+  //To read Temp
+  int sensorValue = analogRead(tempPin);
+  float voltage = sensorValue * (5.0 / 1024.0);
+  float tempC = (voltage - 0.5) * 100.0;
+  //Motor Behavior 
+  int pwmValue = 0;
+  if (tempC < 27.0) {
+    // OFF below 27C
+    pwmValue = 0;
+  } 
+  else if (tempC >= 40.0) {
+    // Maximum speed at 40C or above
+    pwmValue = 255;
+  } 
+  else {
+     pwmValue = (tempC - 27.0) * (255.0 / (40.0 - 27.0));
+  }
+  //PWM signal to control motor speed
+  analogWrite(enablePin, pwmValue);
+  // Print output every 500 ms
+  Serial.print("Temp: ");
+  Serial.print(tempC, 1); 
+  Serial.print("C, PWM: ");
+  Serial.println(pwmValue);
+  
+  delay(500); //delay of 500ms
+}
